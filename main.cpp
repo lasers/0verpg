@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
       if (move == 'q') { std::cout << MAGENTA << "🏁 " << trim(CONF["gameEnded"]) << RESETCOLOUR << "\n"; return EXIT_SUCCESS; }
       if (move == potionKey) { usePotion(hero); continue; }
       if (move == armourKey) { equipArmour(hero); continue; }
-      if (move == weaponKey) { equipWeapon(hero, weapons, 1, 0); continue; }
+      if (move == weaponKey) { equipWeapon(hero, hero.inventoryWeapons, 1, 0); continue; }
       if (move == spellKey) { equipSpell(hero); continue; }
       int newX = hero.x, newY = hero.y;
       if (move == wKey) newX--;
@@ -395,21 +395,16 @@ void equipArmour(Hero &hero) {
 // Equip weapon from inventory
 void equipWeapon(Hero &hero, std::vector<Weapon> &weapons, int index, int usedFromWebShop) {
   if (usedFromWebShop == 0) {
-    int idx = 0;
     std::cout << MAGENTA << trim(CONF["curEquippedWeapon"]) << ": " << RESETCOLOUR << GREEN << hero.equippedWeapon.name << " (" << trim(CONF["attack"]) << " +" << hero.equippedWeapon.attack << ")" << RESETCOLOUR << "\n";
     std::cout << trim(CONF["inventoryWeapons"]) << ":\n";
-    for (size_t i = 0; i < hero.inventoryWeapons.size(); ++i) {
-      std::cout << YELLOW << i+1 << ". " << RESETCOLOUR << coloursArr[std::rand() % coloursArrLen] << hero.inventoryWeapons[i].name << RESETCOLOUR
-        << CYAN << " (" << trim(CONF["attack"]) << " +" << RESETCOLOUR << YELLOW << hero.inventoryWeapons[i].attack << RESETCOLOUR << CYAN << ")" << RESETCOLOUR
-        << BLUE << " (" << (hero.inventoryWeapons[i].name == hero.equippedWeapon.name ? trim(CONF["currentlyEquippedWeapon"]) : trim(CONF["goodWeapon"])) << ")" << RESETCOLOUR << "\n";
+    for (size_t i = 0; i < weapons.size(); ++i) {
+      std::cout << YELLOW << i + 1 << ". " << RESETCOLOUR << coloursArr[std::rand() % coloursArrLen] << weapons[i].name << RESETCOLOUR
+        << CYAN << " (" << trim(CONF["attack"]) << " +" << RESETCOLOUR << YELLOW << weapons[i].attack << RESETCOLOUR << CYAN << ")" << RESETCOLOUR
+        << BLUE << " (" << (weapons[i].name == hero.equippedWeapon.name ? trim(CONF["currentlyEquippedWeapon"]) : trim(CONF["goodWeapon"])) << ")" << RESETCOLOUR << "\n";
     }
     std::cout << trim(CONF["chooseWeaponNumber"]) << ": ";
-    std::cin >> idx;
-    idx--;
-    if (idx < 0 || idx >= static_cast<int>(hero.inventoryWeapons.size())) { std::cout << trim(CONF["invalidWeaponIndex"]) << ".\n"; return; }
-    hero.equippedWeapon = hero.inventoryWeapons[idx];
-    std::cout << CYAN << hero.name << RESETCOLOUR << " " <<  trim(CONF["equipped"]) << " " << BLUE << hero.equippedWeapon.name << " (" <<  trim(CONF["attack"]) << " +" << hero.equippedWeapon.attack << ")" << RESETCOLOUR << "\n";
-    return;
+    std::cin >> index;
+    index--;
   }
   if (index < 0 || index >= static_cast<int>(weapons.size())) { std::cout << trim(CONF["invalidWeaponIndex"]) << ".\n"; return; }
   hero.equippedWeapon = weapons[index];
