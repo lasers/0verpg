@@ -5,9 +5,27 @@
 # 0verpg
 Small Dungeon Based Game that is cross-platform available.
 
+### Features
+
+🗡️ Dungeon exploration
+👾 RPG-style gameplay
+⚔️ Turn-based combat
+🎒 Equipment, Armour, Weapon, Potion, Spell systems
+🧙 Choose from multiple character classes
+💀 Monster encounters defeat increasingly powerful enemies
+📈 Character progression and equip class-specific gear
+🏆 Loot collection
+🗺️ Randomized dungeon adventures
+⌨️ Lightweight terminal/console interface
+🖥️ Cross-platform support (Linux, BSD, MacOS and Windows)
+🚀 Written entirely in modern C++20
+⚔️ Level up and improve your hero
+
+---
+
 # Compile
 
-```make
+```bash
 make -j8 # to use 8 cores/threads in parallel compile
 cp -r .0verpg.json ~/
 sudo make install
