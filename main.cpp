@@ -395,6 +395,7 @@ void equipArmour(Hero &hero) {
 // Equip weapon from inventory
 void equipWeapon(Hero &hero, std::vector<Weapon> &weapons, int index, int usedFromWebShop) {
   if (usedFromWebShop == 0) {
+    int idx = 0;
     std::cout << MAGENTA << trim(CONF["curEquippedWeapon"]) << ": " << RESETCOLOUR << GREEN << hero.equippedWeapon.name << " (" << trim(CONF["attack"]) << " +" << hero.equippedWeapon.attack << ")" << RESETCOLOUR << "\n";
     std::cout << trim(CONF["inventoryWeapons"]) << ":\n";
     for (size_t i = 0; i < hero.inventoryWeapons.size(); ++i) {
@@ -403,9 +404,14 @@ void equipWeapon(Hero &hero, std::vector<Weapon> &weapons, int index, int usedFr
         << BLUE << " (" << (hero.inventoryWeapons[i].name == hero.equippedWeapon.name ? trim(CONF["currentlyEquippedWeapon"]) : trim(CONF["goodWeapon"])) << ")" << RESETCOLOUR << "\n";
     }
     std::cout << trim(CONF["chooseWeaponNumber"]) << ": ";
-    std::cin >> index;
+    std::cin >> idx;
+    idx--;
+    if (idx < 0 || idx >= static_cast<int>(hero.inventoryWeapons.size())) { std::cout << trim(CONF["invalidWeaponIndex"]) << ".\n"; return; }
+    hero.equippedWeapon = hero.inventoryWeapons[idx];
+    std::cout << CYAN << hero.name << RESETCOLOUR << " " <<  trim(CONF["equipped"]) << " " << BLUE << hero.equippedWeapon.name << " (" <<  trim(CONF["attack"]) << " +" << hero.equippedWeapon.attack << ")" << RESETCOLOUR << "\n";
+    return;
   }
-  if (index < 0 || index >= (int)weapons.size()) { std::cout << trim(CONF["invalidWeaponIndex"]) << ".\n"; return; }
+  if (index < 0 || index >= static_cast<int>(weapons.size())) { std::cout << trim(CONF["invalidWeaponIndex"]) << ".\n"; return; }
   hero.equippedWeapon = weapons[index];
   std::cout << CYAN << hero.name << RESETCOLOUR << " " <<  trim(CONF["equipped"]) << " " << BLUE << hero.equippedWeapon.name << " (" <<  trim(CONF["attack"]) << " +" << hero.equippedWeapon.attack << ")" << RESETCOLOUR << "\n";
 }
