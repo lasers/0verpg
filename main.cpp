@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
   }
   int choice;
   std::cin >> choice;
-  if (choice >= 1 && choice <= (int)armours.size()) {
+  if (choice >= 1 && choice <= static_cast<int>(armours.size())) {
     hero.equippedArmour = armours[choice-1];
     hero.inventoryArmours.emplace_back(armours[choice-1]);
   }
@@ -387,7 +387,7 @@ void equipArmour(Hero &hero) {
   int index;
   std::cin >> index;
   index--;
-  if (index < 0 || index >= (int)hero.inventoryArmours.size()) { std::cout << trim(CONF["invalidArmourIndex"]) << ".\n"; return; }
+  if (index < 0 || index >= static_cast<int>(hero.inventoryArmours.size())) { std::cout << trim(CONF["invalidArmourIndex"]) << ".\n"; return; }
   hero.equippedArmour = hero.inventoryArmours[index];
   std::cout << CYAN << hero.name << RESETCOLOUR << " " << trim(CONF["equipped"]) << " " << BLUE << hero.equippedArmour.name << " (" << trim(CONF["defense"]) << " +" << hero.equippedArmour.defense << ")" << RESETCOLOUR << "\n";
 }
@@ -425,7 +425,7 @@ void equipSpell(Hero &hero) {
   int index;
   std::cin >> index;
   index--;
-  if (index < 0 || index >= (int)hero.inventorySpells.size()) { std::cout << trim(CONF["invalidSpellIndex"]) << ".\n"; return; }
+  if (index < 0 || index >= static_cast<int>(hero.inventorySpells.size())) { std::cout << trim(CONF["invalidSpellIndex"]) << ".\n"; return; }
   hero.equippedSpell = hero.inventorySpells[index];
   std::cout << CYAN << hero.name << RESETCOLOUR << " " << trim(CONF["equipped"]) << " " << BLUE << hero.equippedSpell.name
     << " (+" << trim(CONF["attack"]) << " " << hero.inventorySpells[index].attack << " " << trim(CONF["manaCost"]) << " -" << hero.equippedSpell.manaCost << ")" << RESETCOLOUR << "\n";
@@ -626,7 +626,7 @@ void weaponShop(Hero &hero, std::vector<Weapon> &weapons) {
   std::cout << "0. " << trim(CONF["skip"]) << "\n";
   int choice;
   std::cout << BLUE << trim(CONF["chooseWeaponNumber"]) << ": " << RESETCOLOUR;
-  if (!(std::cin >> choice) || choice < 0 || choice > (int)weapons.size()) {
+  if (!(std::cin >> choice) || choice < 0 || choice > static_cast<int>(weapons.size())) {
     std::cin.clear(); std::cin.ignore(1000, '\n');
     std::cout << RED << trim(CONF["invalidChoiceSkipping"]) << "." << RESETCOLOUR << "\n";
     return;
@@ -648,7 +648,7 @@ void potionShop(Hero &hero, std::vector<Potion> &potionsList) {
   std::cout << "0. " << trim(CONF["skip"]) << "\n";
   int choice;
   std::cout << BLUE << trim(CONF["choosePotion"]) << ": " << RESETCOLOUR;
-  if (!(std::cin >> choice) || choice < 0 || choice > (int)potionsList.size()) { std::cin.clear(); std::cin.ignore(1000, '\n'); std::cout << trim(CONF["invalidChoiceSkipping"]) << ".\n"; return; }
+  if (!(std::cin >> choice) || choice < 0 || choice > static_cast<int>(potionsList.size())) { std::cin.clear(); std::cin.ignore(1000, '\n'); std::cout << trim(CONF["invalidChoiceSkipping"]) << ".\n"; return; }
   if (choice == 0) return;
   Potion selected = potionsList[choice-1];
   if (hero.gold >= selected.cost) {
