@@ -509,8 +509,8 @@ void lootRoom(Hero &hero, std::vector<Armour> &armours, std::vector<Weapon> &wea
 void usePotion(Hero &hero) {
   if (hero.inventoryPotions.size() > 0) {
     if (hero.companion.health <= 0) { hero.companion.health = 0; std::cout << GREEN << trim(CONF["resurrectCompanion"]) << RESETCOLOUR << "\n"; }
-    if (hero.mana + 30 >= hero.maxMana) { hero.mana = hero.maxMana; } else { hero.mana += 30; }
     Potion p = hero.inventoryPotions.back();
+    hero.mana = std::min(hero.maxMana, hero.mana + 20);
     hero.health = std::min(hero.maxHP, hero.health + p.healAmount);
     hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health + p.healAmount);
     std::cout << GREEN << trim(CONF["potionUsed"]) << "!" << RESETCOLOUR << "  +" << p.healAmount << " " << trim(CONF["hpCurrentHP"]) << ": " << MAGENTA << hero.health
