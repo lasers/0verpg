@@ -103,7 +103,6 @@ struct Hero {
   std::vector<Weapon> inventoryWeapons;
   std::vector<Potion> inventoryPotions;
   std::vector<Spell> inventorySpells;
-  int potions;
   int gold;
   int x, y;
   int xp;
@@ -705,8 +704,8 @@ std::vector<std::vector<char>> generateMap(int size) {
 // Display map with fog of war
 void displayMap(const std::vector<std::vector<char>> &map, const std::vector<std::vector<bool>> &visited, const Hero &hero) {
   std::cout << "\n" << GREEN << trim(CONF["dungeonMap"]) << ":" << RESETCOLOUR << "\n";
-  for (int i = 0; i < map.size(); ++i) {
-    for (int j = 0; j < map[i].size(); ++j) {
+  for (int i = 0; i < static_cast<int>(map.size()); ++i) {
+    for (int j = 0; j < static_cast<int>(map[i].size()); ++j) {
       if (i == hero.x && j == hero.y) std::cout << GREEN << 'H' << RESETCOLOUR << ' ';
       else if (visited[i][j]) std::cout << map[i][j] << ' ';
       else std::cout << YELLOW << '?' << RESETCOLOUR << ' ';
@@ -767,7 +766,6 @@ int readKey(void) {
 #endif /* _WIN32 */
 
 // Configure the movement/inventories/potion consumption
-#define GETSTR(str) CONF[str].get<std::string>().c_str()
 void setupKeys(void) {
   int x = 0;
   std::cout << trim(CONF["pressKeyFor"]) << " ";
