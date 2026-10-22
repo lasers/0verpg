@@ -441,7 +441,12 @@ bool battle(Hero &hero, Enemy enemy) {
     if(std::rand() % 100 < 20) { heroAttack *= 2; std::cout << YELLOW << trim(CONF["criticalHit"]) << "!" << RESETCOLOUR << "\n"; }
     enemy.health -= heroAttack;
     if (hero.companion.health > 0) { enemy.health -= hero.companion.attack; }
-    if (hero.mana - 10 <= 0) { hero.mana = 0; } else { hero.mana -= 10 - hero.equippedSpell.manaCost; hero.weaponAttackDecreased = 0; }
+    int manaCost = 10 + hero.equippedSpell.manaCost;
+    if (hero.mana - manaCost <= 0) { hero.mana = 0; }
+    else {
+      hero.mana -= manaCost;
+      if (hero.weaponAttackDecreased == 1) { hero.equippedWeapon.attack += 3; hero.weaponAttackDecreased = 0; } // mana came back mid-battle
+    }
     if (hero.mana == 0 && hero.weaponAttackDecreased == 0) { hero.equippedWeapon.attack -= 3; hero.weaponAttackDecreased = 1; }
     std::cout << CYAN << hero.name << RESETCOLOUR << " " << trim(CONF["attacksFor"]) << " " << YELLOW << heroAttack << RESETCOLOUR << " " << trim(CONF["damage"]) << "! "
       << BLUE << trim(CONF["companionAttacksFor"]) << " " << (hero.companion.health > 0 ? hero.companion.attack : 0) << " " << trim(CONF["damage"]) << " " << RESETCOLOUR
@@ -463,7 +468,8 @@ bool battle(Hero &hero, Enemy enemy) {
     if (damage < 0) damage = 0;
     if(std::rand() % 100 < 15) { std::cout << MAGENTA << hero.name << RESETCOLOUR << GREEN << " " << trim(CONF["dodged"]) << "!" << RESETCOLOUR << "\n"; damage = 0; }
     hero.health -= damage;
-    hero.companion.health -= damage;
+    bool companionWasAlive = hero.companion.health > 0;
+    hero.companion.health = std::max(0, hero.companion.health - damage);
     std::cout << RED << enemy.name << RESETCOLOUR << " " << trim(CONF["attacksFor"]) << " " << RED << enemy.attack << RESETCOLOUR
       << " (" << trim(CONF["blocked"]) << " " << MAGENTA << totalDefense << RESETCOLOUR << ") " << trim(CONF["damageTaken"]) << ": " << YELLOW << damage
       << RESETCOLOUR << RED << " | " << trim(CONF["companion"]) << RESETCOLOUR << ": " << damage << YELLOW << " " << hero.name << RESETCOLOUR
@@ -471,7 +477,7 @@ bool battle(Hero &hero, Enemy enemy) {
       << std::max(0, hero.companion.health) << trim(CONF["hp"]) << RESETCOLOUR << "\n";
     // Auto-use potion if low HP
     if (hero.health <= 30 && hero.inventoryPotions.size() > 0) { std::cout << CYAN << "⚠ " << trim(CONF["autoUsingPotion"]) << "..." << RESETCOLOUR << "\n"; usePotion(hero); }
-    if (hero.companion.health <= 0) { std::cout << RED <<trim(CONF["companion"]) << " " << trim(CONF["hasFallen"]) << "..." << RESETCOLOUR << "\n"; }
+    if (companionWasAlive && hero.companion.health == 0) { std::cout << RED <<trim(CONF["companion"]) << " " << trim(CONF["hasFallen"]) << "..." << RESETCOLOUR << "\n"; }
     if (hero.health <= 0) { std::cout << RED << hero.name << " " << trim(CONF["hasFallen"]) << "..." << RESETCOLOUR << "\n"; return false; }
   }
   return false;
@@ -701,16 +707,16 @@ void gainXP(Hero &hero, int amount) {
   hero.xp += amount;
   std::cout << GREEN << hero.name << RESETCOLOUR << YELLOW << " " << trim(CONF["gained"]) << " " << RESETCOLOUR << CYAN << amount << " " << trim(CONF["xp"]) << "!" << RESETCOLOUR << "\n";
   if (hero.xp >= hero.level * 50) { // Level up threshold
+    hero.xp -= hero.level * 50; // keep the XP above the threshold
     hero.level++;
-    hero.health = std::min(hero.maxHP, hero.health + 20);
-    hero.mana = std::min(hero.maxMana, hero.mana + 20);
-    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health + 20);
     hero.baseAttack += 5;
     hero.maxHP += 5;
     hero.maxMana += 5;
     hero.baseDefense += 2;
     hero.companion.maxHP += 5;
-    hero.xp = 0; // reset XP after level up
+    hero.health = std::min(hero.maxHP, hero.health + 20);
+    hero.mana = std::min(hero.maxMana, hero.mana + 20);
+    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health + 20);
     std::cout << GREEN << "*** " << trim(CONF["levelUP"]) << "! *** " << RESETCOLOUR << MAGENTA << hero.name << RESETCOLOUR << YELLOW << " " << trim(CONF["isNowLevel"]) << " " << hero.level << RESETCOLOUR << "!\n";
   }
 }
