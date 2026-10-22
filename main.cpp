@@ -574,8 +574,9 @@ bool exploreRoom(Hero &hero, std::vector<Enemy> &enemies, std::vector<Armour> &a
     cell = '.';
     return true;
   } else if (cell == 'F') {
-    std::cout << GREEN << trim(CONF["healingFountain"]) << " " << hero.maxHP << " " << trim(CONF["hp"]) << RESETCOLOUR << std::endl;
+    std::cout << GREEN << trim(CONF["healingFountain"]) << " " << hero.name << " " << hero.maxHP << " " << trim(CONF["hp"]) << ", " << trim(CONF["companion"]) << " " << hero.companion.maxHP << trim(CONF["hp"]) << RESETCOLOUR << std::endl;
     hero.health = hero.maxHP;
+    hero.companion.health = hero.companion.maxHP;
     cell = '.';
     return true;
   } else if (cell == 'S') {
