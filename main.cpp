@@ -23,6 +23,7 @@
 #include <cctype>
 #include <random>
 #include <fstream>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -192,7 +193,7 @@ int main(int argc, char *argv[]) {
     {.name = trim(CONF["rogue"]),   .health = 70, .baseDefense = 7,  .baseAttack = 3, .mana = 70, .maxMana = 70},
     {.name = trim(CONF["paladin"]), .health = 75, .baseDefense = 6,  .baseAttack = 2, .mana = 75, .maxMana = 75}
   };
-  while (classChoice < 1 || classChoice > characters.size()) {
+  while (classChoice < 1 || classChoice > static_cast<int>(characters.size())) {
     std::cout << GREEN << trim(CONF["chooseClass"]) << RESETCOLOUR << ":\n";
     for (unsigned int indexNum = 0U; indexNum < characters.size(); indexNum++) {
       std::cout << YELLOW << indexNum + 1 << ". " << RESETCOLOUR << BLUE << characters[indexNum].name << RESETCOLOUR << "\n";
@@ -328,7 +329,7 @@ int main(int argc, char *argv[]) {
         << " | " << "🪄 " << MAGENTA << trim(CONF["spell"]) << ": " << hero.equippedSpell.name << RESETCOLOUR
         << " 👹 " << CYAN << hero.name << RESETCOLOUR << YELLOW << " " << trim(CONF["level"]) << ": " << RESETCOLOUR << MAGENTA << hero.level << RESETCOLOUR << ", " 
         << CYAN << hero.xp << "/" << hero.level * 50 << " " << trim(CONF["xp"]) << RESETCOLOUR << " | 🐶 " << RED << trim(CONF["companion"])
-        << " " << hero.companion.health << trim(CONF["hp"]) << RESETCOLOUR << "\n";
+        << " " << std::max(0, hero.companion.health) << trim(CONF["hp"]) << RESETCOLOUR << "\n";
       std::cout << YELLOW << trim(CONF["move"]) <<  " (" << wKey << "/" <<  dKey << "/" <<  aKey << "/" <<  sKey << "), " <<  potionKey << " " << trim(CONF["usePotion"]) << ", "
         <<  armourKey << " " << trim(CONF["toChangeArmour"]) << ", " <<  weaponKey << " " << trim(CONF["toChangeWeapon"])
         << ", " <<  spellKey << " " << trim(CONF["toChangeSpell"]) << ", Q " << trim(CONF["toQuit"]) << ": " << RESETCOLOUR << std::endl;
