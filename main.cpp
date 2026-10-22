@@ -440,11 +440,11 @@ bool battle(Hero &hero, Enemy enemy) {
     int heroAttack = hero.baseAttack + hero.equippedWeapon.attack + hero.equippedSpell.attack;
     if(std::rand() % 100 < 20) { heroAttack *= 2; std::cout << YELLOW << trim(CONF["criticalHit"]) << "!" << RESETCOLOUR << "\n"; }
     enemy.health -= heroAttack;
-    enemy.health -= hero.companion.attack;
+    if (hero.companion.health > 0) { enemy.health -= hero.companion.attack; }
     if (hero.mana - 10 <= 0) { hero.mana = 0; } else { hero.mana -= 10 - hero.equippedSpell.manaCost; hero.weaponAttackDecreased = 0; }
     if (hero.mana == 0 && hero.weaponAttackDecreased == 0) { hero.equippedWeapon.attack -= 3; hero.weaponAttackDecreased = 1; }
     std::cout << CYAN << hero.name << RESETCOLOUR << " " << trim(CONF["attacksFor"]) << " " << YELLOW << heroAttack << RESETCOLOUR << " " << trim(CONF["damage"]) << "! "
-      << BLUE << trim(CONF["companionAttacksFor"]) << " " << hero.companion.attack << " " << trim(CONF["damage"]) << " " << RESETCOLOUR
+      << BLUE << trim(CONF["companionAttacksFor"]) << " " << (hero.companion.health > 0 ? hero.companion.attack : 0) << " " << trim(CONF["damage"]) << " " << RESETCOLOUR
       << GREEN << (hero.mana > 0 ? trim(CONF["manaUsed"]) : trim(CONF["noManaUsed"])) << RESETCOLOUR << " | " << enemy.name << " " << trim(CONF["hp"])
       << ": " << RED << std::max(0, enemy.health) << RESETCOLOUR << "\n";
     if (enemy.health <= 0) {
