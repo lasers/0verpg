@@ -418,7 +418,7 @@ void equipSpell(Hero &hero) {
   for (size_t i = 0; i < hero.inventorySpells.size(); ++i) {
     std::cout << YELLOW << i+1 << ". " << RESETCOLOUR << coloursArr[std::rand() % coloursArrLen] << hero.inventorySpells[i].name << RESETCOLOUR
       << CYAN << " (" << trim(CONF["attack"]) << " +" << RESETCOLOUR << YELLOW << hero.inventorySpells[i].attack << RESETCOLOUR << " -"
-      << YELLOW << trim(CONF["manaCost"]) << " " << hero.inventorySpells[i].manaCost << RESETCOLOUR  << CYAN << ")"
+      << YELLOW << hero.inventorySpells[i].manaCost << " " << trim(CONF["manaCost"]) << RESETCOLOUR  << CYAN << ")"
       << RESETCOLOUR << BLUE << " (" << (hero.inventorySpells[i].name == hero.equippedSpell.name ? trim(CONF["currentlyEquippedSpell"]) : trim(CONF["goodSpell"])) << ")" << RESETCOLOUR "\n";
   }
   std::cout << trim(CONF["chooseSpellNumber"]) << ": ";
