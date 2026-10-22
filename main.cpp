@@ -334,17 +334,19 @@ int main(int argc, char *argv[]) {
         <<  armourKey << " " << trim(CONF["toChangeArmour"]) << ", " <<  weaponKey << " " << trim(CONF["toChangeWeapon"])
         << ", " <<  spellKey << " " << trim(CONF["toChangeSpell"]) << ", Q " << trim(CONF["toQuit"]) << ": " << RESETCOLOUR << std::endl;
       //std::cin >> move;
-      char move = std::tolower(static_cast<unsigned char>(readKey()));
+      int move = readKey();
+      if (move < 0) { return EXIT_SUCCESS; } // stdin closed
+      if (move < 256) { move = std::tolower(move); }
       if (move == 'q') { std::cout << MAGENTA << "🏁 " << trim(CONF["gameEnded"]) << RESETCOLOUR << "\n"; return EXIT_SUCCESS; }
-      if (move == potionKey) { usePotion(hero); continue; }
-      if (move == armourKey) { equipArmour(hero); continue; }
-      if (move == weaponKey) { equipWeapon(hero, hero.inventoryWeapons, 1, 0); continue; }
-      if (move == spellKey) { equipSpell(hero); continue; }
+      if (move == keys[6]) { usePotion(hero); continue; }
+      if (move == keys[4]) { equipArmour(hero); continue; }
+      if (move == keys[5]) { equipWeapon(hero, hero.inventoryWeapons, 1, 0); continue; }
+      if (move == keys[7]) { equipSpell(hero); continue; }
       int newX = hero.x, newY = hero.y;
-      if (move == wKey) newX--;
-      else if (move == sKey) newX++;
-      else if (move == aKey) newY--;
-      else if (move == dKey) newY++;
+      if (move == keys[1]) newX--;
+      else if (move == keys[3]) newX++;
+      else if (move == keys[2]) newY--;
+      else if (move == keys[0]) newY++;
       // Check boundaries
       if (newX < 0 || newX >= mapSize || newY < 0 || newY >= mapSize) { std::cout << RED << "❌ " << trim(CONF["cantMoveOutsideDungeon"]) << RESETCOLOUR << "\n"; continue; }
       hero.x = newX;
@@ -724,18 +726,26 @@ int readKey(void) {
 }
 #else
 int readKey(void) {
-  char buf = 0;
-  struct termios old = {0};
+  struct termios old = {}, raw;
   fflush(stdout);
-  if(tcgetattr(0, &old) < 0) { perror("tcsetattr()"); }
-  old.c_lflag &= (~ICANON); // local modes = Non Canonical mode
-  old.c_cc[VMIN] = 1;  // control chars (MIN value) = 1
-  old.c_cc[VTIME] = 0; // control chars (TIME value) = 0 (No time)
-  if(tcsetattr(0, TCSANOW, &old) < 0) { perror("tcsetattr ICANON"); }
-  if(read(0, &buf, 1) < 0) { perror("read()"); }
-  old.c_lflag |= ICANON; // local modes = Canonical mode
-  if(tcsetattr(0, TCSADRAIN, &old) < 0) { perror("tcsetattr ~ICANON"); }
-  return buf;
+  if (tcgetattr(STDIN_FILENO, &old) < 0) { perror("tcgetattr()"); return -1; }
+  raw = old;
+  raw.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO)); // Non canonical mode, no echo
+  raw.c_cc[VMIN] = 1;
+  raw.c_cc[VTIME] = 0;
+  if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) < 0) { perror("tcsetattr ICANON"); }
+  unsigned char c = 0;
+  int result = read(STDIN_FILENO, &c, 1) == 1 ? c : -1;
+  // Read the rest of an arrow key while still raw: going back to canonical mode first makes macOS echo "[C"
+  if (result == 27) {
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 1; // wait up to 0.1 s
+    tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+    unsigned char seq[2] = {};
+    if (read(STDIN_FILENO, seq, 2) == 2 && (seq[0] == '[' || seq[0] == 'O') && seq[1] >= 'A' && seq[1] <= 'D') { result = 1001 + (seq[1] - 'A'); } // up, down, right, left
+  }
+  if (tcsetattr(STDIN_FILENO, TCSADRAIN, &old) < 0) { perror("tcsetattr ~ICANON"); }
+  return result;
 }
 #endif /* _WIN32 */
 
@@ -747,7 +757,9 @@ void setupKeys(void) {
   for (auto text : { "right", "up", "left", "down", "armourInventory",
       "weaponInventory", "consumeApotion", "spellInventory" }) {
     std::cout << trim(CONF[text]);
-    keys[x++] = readKey();
+    int k = readKey();
+    if (k < 0) { std::exit(EXIT_SUCCESS); } // stdin closed
+    keys[x++] = (k < 256) ? std::tolower(k) : k;
   }
   std::cout << BLUE << "\n" << trim(CONF["keysEstablished"]) << "\n" << RESETCOLOUR << std::endl;
 }
