@@ -455,9 +455,6 @@ bool battle(Hero &hero, Enemy enemy) {
       if (hero.mana + 10 > hero.maxMana) { hero.mana = hero.maxMana; } else { hero.mana += 10; }
       if (hero.weaponAttackDecreased == 1) { hero.equippedWeapon.attack += 3; hero.weaponAttackDecreased = 0; }
       std::cout << BLUE << hero.name << RESETCOLOUR << " " << MAGENTA << trim(CONF["restoresMana"]) << RESETCOLOUR << "\n";
-      // Random loot drop
-      int lootChance = std::rand() % 3;
-      if (lootChance == 0) { std::cout << YELLOW << trim(CONF["lootDropPotion"]) << ": " << RESETCOLOUR << hero.inventoryPotions.size() << "\n"; }
       return true;
     }
     // Enemy attacks
