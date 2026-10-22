@@ -174,7 +174,7 @@ std::string trim(std::string str);
 // Read a menu number
 int readNumber(void);
 
-int main(int argc, char *argv[]) {
+int play(int argc, char *argv[]) {
 #ifdef _WIN32
   SetConsoleTitle("0verpg");
 #endif /*_WIN32 */
@@ -377,6 +377,15 @@ int main(int argc, char *argv[]) {
   }
   std::cout << GREEN << "\n🎉 " << trim(CONF["win"]) << RESETCOLOUR << "\n";
   return EXIT_SUCCESS;
+}
+
+int main(int argc, char *argv[]) {
+  // An old or hand-edited config is missing keys or isn't valid JSON
+  try { return play(argc, argv); }
+  catch (const json::exception &e) {
+    std::cerr << "Error: " << configHome << " is outdated or broken, copy the new .0verpg.json from the repository (" << e.what() << ")\n";
+    return EXIT_FAILURE;
+  }
 }
 
 // Equip armour from inventory
@@ -602,7 +611,7 @@ void shop(Hero &hero, std::vector<Armour> &armours, std::vector<Potion> &potions
   std::cout << CYAN << "\n🏪 " << trim(CONF["welcomeYouHave"]) << " " << RESETCOLOUR << YELLOW << hero.gold << " " << trim(CONF["gold"]) << "." << RESETCOLOUR << "\n";
   std::cout << YELLOW << "1." << RESETCOLOUR << BLUE << " " << trim(CONF["buyPotion"]) << " " << RESETCOLOUR << YELLOW << "(20 " << trim(CONF["gold"]) << ")" << RESETCOLOUR << "\n";
   std::cout << YELLOW << "2." << RESETCOLOUR << BLUE << " " << trim(CONF["buyArmourUpgrade"]) << " " << RESETCOLOUR << YELLOW << "(50 " << trim(CONF["gold"]) << ")" << RESETCOLOUR << "\n";
-  std::cout << "3. Exit Shop\n";
+  std::cout << YELLOW << "3." << RESETCOLOUR << " " << trim(CONF["skip"]) << "\n";
   int choice;
   choice = readNumber();
   if (choice == 1) {
