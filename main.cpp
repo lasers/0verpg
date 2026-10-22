@@ -513,8 +513,8 @@ void usePotion(Hero &hero) {
     Potion p = hero.inventoryPotions.back();
     hero.health += p.healAmount;
     hero.companion.health += p.healAmount;
-    if (hero.health > hero.maxHP) { hero.health = hero.maxHP; }
-    if (hero.companion.health > hero.companion.maxHP) { hero.companion.health = hero.companion.maxHP; }
+    hero.health = std::min(hero.maxHP, hero.health);
+    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health);
     std::cout << GREEN << trim(CONF["potionUsed"]) << "!" << RESETCOLOUR << "  +" << p.healAmount << " " << trim(CONF["hpCurrentHP"]) << ": " << MAGENTA << hero.health
       << RESETCOLOUR << " " << CYAN << trim(CONF["companionHeal"]) << " " << hero.companion.health << RESETCOLOUR
       << " " << trim(CONF["addedMana"]) << ": " << BLUE << hero.mana << " " << trim(CONF["mana"]) << RESETCOLOUR << "\n";
@@ -709,9 +709,9 @@ void gainXP(Hero &hero, int amount) {
     hero.health += 20;
     hero.mana += 20;
     hero.companion.health += 20;
-    if (hero.health > hero.maxHP) { hero.health = hero.maxHP; }
-    if (hero.mana > hero.maxMana) { hero.mana = hero.maxMana; }
-    if (hero.companion.health > hero.companion.maxHP) { hero.companion.health = hero.companion.maxHP; }
+    hero.health = std::min(hero.maxHP, hero.health);
+    hero.mana = std::min(hero.maxMana, hero.mana);
+    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health);
     hero.baseAttack += 5;
     hero.maxHP += 5;
     hero.maxMana += 5;
