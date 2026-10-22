@@ -171,6 +171,8 @@ void gainXP(Hero &her, int amount);
 int readKey(void);
 void setupKeys(void);
 std::string trim(std::string str);
+// Read a menu number
+int readNumber(void);
 
 int main(int argc, char *argv[]) {
 #ifdef _WIN32
@@ -198,7 +200,7 @@ int main(int argc, char *argv[]) {
     for (unsigned int indexNum = 0U; indexNum < characters.size(); indexNum++) {
       std::cout << YELLOW << indexNum + 1 << ". " << RESETCOLOUR << BLUE << characters[indexNum].name << RESETCOLOUR << "\n";
     }
-    std::cin >> classChoice;
+    classChoice = readNumber();
   }
   classChoice--;
   std::cout << BLUE << trim(CONF["classChosen"]) << " " << characters[classChoice].name << RESETCOLOUR << std::endl;
@@ -301,7 +303,7 @@ int main(int argc, char *argv[]) {
     std::cout << YELLOW << i+1 << ". " << RESETCOLOUR << MAGENTA << armours[i].name << CYAN << " (" << trim(CONF["defense"]) << " +" << RESETCOLOUR << YELLOW << armours[i].defense << RESETCOLOUR << CYAN << ")" << RESETCOLOUR << "\n";
   }
   int choice;
-  std::cin >> choice;
+  choice = readNumber();
   if (choice >= 1 && choice <= static_cast<int>(armours.size())) {
     hero.equippedArmour = armours[choice-1];
     hero.inventoryArmours.emplace_back(armours[choice-1]);
@@ -388,7 +390,7 @@ void equipArmour(Hero &hero) {
   }
   std::cout << trim(CONF["chooseArmourNumber"]) << ": ";
   int index;
-  std::cin >> index;
+  index = readNumber();
   index--;
   if (index < 0 || index >= static_cast<int>(hero.inventoryArmours.size())) { std::cout << trim(CONF["invalidArmourIndex"]) << ".\n"; return; }
   hero.equippedArmour = hero.inventoryArmours[index];
@@ -406,7 +408,7 @@ void equipWeapon(Hero &hero, std::vector<Weapon> &weapons, int index, int usedFr
         << BLUE << " (" << (weapons[i].name == hero.equippedWeapon.name ? trim(CONF["currentlyEquippedWeapon"]) : trim(CONF["goodWeapon"])) << ")" << RESETCOLOUR << "\n";
     }
     std::cout << trim(CONF["chooseWeaponNumber"]) << ": ";
-    std::cin >> index;
+    index = readNumber();
     index--;
   }
   if (index < 0 || index >= static_cast<int>(weapons.size())) { std::cout << trim(CONF["invalidWeaponIndex"]) << ".\n"; return; }
@@ -426,7 +428,7 @@ void equipSpell(Hero &hero) {
   }
   std::cout << trim(CONF["chooseSpellNumber"]) << ": ";
   int index;
-  std::cin >> index;
+  index = readNumber();
   index--;
   if (index < 0 || index >= static_cast<int>(hero.inventorySpells.size())) { std::cout << trim(CONF["invalidSpellIndex"]) << ".\n"; return; }
   hero.equippedSpell = hero.inventorySpells[index];
@@ -596,7 +598,7 @@ void shop(Hero &hero, std::vector<Armour> &armours, std::vector<Potion> &potions
   std::cout << YELLOW << "2." << RESETCOLOUR << BLUE << " " << trim(CONF["buyArmourUpgrade"]) << " " << RESETCOLOUR << YELLOW << "(50 " << trim(CONF["gold"]) << ")" << RESETCOLOUR << "\n";
   std::cout << "3. Exit Shop\n";
   int choice;
-  std::cin >> choice;
+  choice = readNumber();
   if (choice == 1) {
     if (hero.gold >= 20) {
       hero.gold -= 20;
@@ -772,4 +774,14 @@ std::string trim(std::string str) {
     buf.push_back(x);
   }
   return buf;
+}
+
+// Read a menu number; -1 on bad input, exits if stdin is closed
+int readNumber(void) {
+  int n;
+  if (std::cin >> n) { return n; }
+  if (std::cin.eof()) { std::exit(EXIT_SUCCESS); }
+  std::cin.clear();
+  std::cin.ignore(1000, '\n');
+  return -1;
 }
