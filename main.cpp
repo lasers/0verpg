@@ -511,10 +511,8 @@ void usePotion(Hero &hero) {
     if (hero.companion.health <= 0) { hero.companion.health = 0; std::cout << GREEN << trim(CONF["resurrectCompanion"]) << RESETCOLOUR << "\n"; }
     if (hero.mana + 30 >= hero.maxMana) { hero.mana = hero.maxMana; } else { hero.mana += 30; }
     Potion p = hero.inventoryPotions.back();
-    hero.health += p.healAmount;
-    hero.companion.health += p.healAmount;
-    hero.health = std::min(hero.maxHP, hero.health);
-    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health);
+    hero.health = std::min(hero.maxHP, hero.health + p.healAmount);
+    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health + p.healAmount);
     std::cout << GREEN << trim(CONF["potionUsed"]) << "!" << RESETCOLOUR << "  +" << p.healAmount << " " << trim(CONF["hpCurrentHP"]) << ": " << MAGENTA << hero.health
       << RESETCOLOUR << " " << CYAN << trim(CONF["companionHeal"]) << " " << hero.companion.health << RESETCOLOUR
       << " " << trim(CONF["addedMana"]) << ": " << BLUE << hero.mana << " " << trim(CONF["mana"]) << RESETCOLOUR << "\n";
@@ -706,12 +704,9 @@ void gainXP(Hero &hero, int amount) {
   std::cout << GREEN << hero.name << RESETCOLOUR << YELLOW << " " << trim(CONF["gained"]) << " " << RESETCOLOUR << CYAN << amount << " " << trim(CONF["xp"]) << "!" << RESETCOLOUR << "\n";
   if (hero.xp >= hero.level * 50) { // Level up threshold
     hero.level++;
-    hero.health += 20;
-    hero.mana += 20;
-    hero.companion.health += 20;
-    hero.health = std::min(hero.maxHP, hero.health);
-    hero.mana = std::min(hero.maxMana, hero.mana);
-    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health);
+    hero.health = std::min(hero.maxHP, hero.health + 20);
+    hero.mana = std::min(hero.maxMana, hero.mana + 20);
+    hero.companion.health = std::min(hero.companion.maxHP, hero.companion.health + 20);
     hero.baseAttack += 5;
     hero.maxHP += 5;
     hero.maxMana += 5;
