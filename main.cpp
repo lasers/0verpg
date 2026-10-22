@@ -126,7 +126,8 @@ struct Character {
 int keys[8];
 
 // These 3 variables are used to retrieve the configuration file and setup the used language from "argv[1]" - if there is any input to request the game language
-std::string configHome = (std::getenv("HOME") ? std::string(std::getenv("HOME")) + std::string("/") : std::string("./")) + ".0verpg.json";
+// The config in the current directory wins, so the game runs straight from the repository; otherwise use the one in HOME
+std::string configHome = std::ifstream(".0verpg.json") ? std::string(".0verpg.json") : (std::getenv("HOME") ? std::string(std::getenv("HOME")) + std::string("/") : std::string("./")) + ".0verpg.json";
 std::string userLang = "en";
 std::ifstream cfg(configHome);
 // Inventory weapons/armours colours for their names
